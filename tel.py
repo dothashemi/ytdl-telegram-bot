@@ -27,12 +27,10 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     result = await send(PATH + file_name, update.message.chat.id, title)
 
     if result == False:
-        await update.message.reply_text(HOST + file_name)
+        await update.message.reply_text(title + "\n" + HOST + file_name)
     else:
         os.remove(PATH + file_name)
 
-    await update.message.reply_text(title)
-    
 
 async def send(path, id, title):
     vid = {'video': open(path, 'rb')}

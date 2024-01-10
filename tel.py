@@ -1,7 +1,10 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import requests
+import os
 
 from local import *
+from yt import download
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -16,11 +19,31 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # log!
     print(f"User ({update.message.chat.id}): {text}")
+    
+    # TODO: validate text to be youtube link
 
-    # TODO: download the video
-    # TODO: send the video
+    title, file_name = download(text)
+    
+    result = await send(PATH + file_name, update.message.chat.id, title)
 
-    await update.message.reply_text("I will send!!")
+    if result == False:
+        await update.message.reply_text(HOST + file_name)
+    else:
+        os.remove(PATH + file_name)
+
+    await update.message.reply_text(title)
+    
+
+async def send(path, id, title):
+    vid = {'video': open(path, 'rb')}
+
+    res = requests.post(f"https://api.telegram.org/bot{TKEY}/sendVideo?chat_id={id}&caption={title}&supports_streaming={True}", 
+                        files=vid)
+
+    if res.status_code != 200:
+        return False
+
+    return True
 
 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):

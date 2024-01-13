@@ -9,7 +9,7 @@ def download(link: str):
     file_name = random.randint(100000000, 999999999)
 
     yt_opts = {
-        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        'format': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
         'outtmpl': f'{PATH}{file_name}.%(ext)s',
     }
 

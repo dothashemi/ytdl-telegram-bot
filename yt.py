@@ -1,30 +1,23 @@
-import configparser
+import logging
+from pytube import YouTube
 import random
-import yt_dlp
 
 from local import *
 
 
-def download(link: str):
-    file_name = random.randint(100000000, 999999999)
+logging.basicConfig(level=logging.INFO)
 
-    options = {
-        'format': 'bestvideo+bestaudio/best',
-        'outtmpl': f'{PATH}{file_name}.%(ext)s',
-        'postprocessors': [{
-            'key': 'FFmpegVideoConvertor',
-            'preferedformat': 'mp4',
-        }],
-    }
+def download(link: str):
+    name = f"{random.randint(100000000, 999999999)}.mp4"
 
     try:
-        with yt_dlp.YoutubeDL(options) as ydl:
-            info = ydl.extract_info(link, download=True)
-            video_title = info.get('title', 'Untitled Video')
-
-            print(f'Title: {video_title}')
-
-            return video_title, f"{file_name}.mp4"
+        yt = YouTube(link)
+        title = yt.title
+        yt = yt.streams.get_highest_resolution()
+        yt.download(filename=name, output_path=PATH)
+        
+        return title, name
     
     except:
-            return "Failed!", "Failed!"
+        return "", ""
+        
